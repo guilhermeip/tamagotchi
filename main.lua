@@ -21,6 +21,7 @@ function love.load()
     --Carregando imagens do mouse
     normalCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/normalCursor.png"), 1, 1)
     appleCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/appleCursor.png"), 27, 31)
+    spongeCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/spongeCursor.png"), 27, 31)
     love.mouse.setCursor(normalCursor)
     mouseStatus = "normal"
 
@@ -28,7 +29,7 @@ function love.load()
     poop = love.graphics.newImage("Imagens/poop.png")
 
     -- variaveis de controle
-    hasPoop = false --MUDAR
+    hasPoop = true --MUDAR
     isSleep = false 
     healthPercent = 100 --MUDAR
     happyPercent = 100 --MUDAR
@@ -101,9 +102,15 @@ function love.mousepressed(mx, my, button)
 
      --BANHEIRO  
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 159 and mx < 159 + 100 and isSleep == false then
-        love.mouse.setCursor(normalCursor)
-        mouseStatus = "normal"
-        UI = love.graphics.newImage("UI/UIToiletSelected.png");
+        if mouseStatus ~= "toilet" then
+            UI = love.graphics.newImage("UI/UIToiletSelected.png");
+            love.mouse.setCursor(spongeCursor)
+            mouseStatus = "toilet"
+        else
+            UI = love.graphics.newImage("UI/UIIconsActions.png");
+            mouseStatus = "normal"
+            love.mouse.setCursor(normalCursor)
+        end
         
     --CURAR
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 297 and mx < 297 + 100 and isSleep == false then
@@ -131,6 +138,15 @@ function love.mousepressed(mx, my, button)
             animation = animationNormal -- MUDAR
             mouseStatus = "normal"
         end
+    end
+    --COMER
+    if button == 1 and my >= 173 and my < 516 and mx >= 173 and mx < 516 and mouseStatus == "eat" then
+        hungryPercent = hungryPercent + 10
+    end
+    --LIMPAR
+    if button == 1 and my >= 450 and my < 506 and mx >= 188 and mx < 232 and mouseStatus == "toilet" then
+        healthPercent = healthPercent + 10
+        hasPoop = false
     end
 end
 
