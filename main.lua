@@ -14,7 +14,7 @@ function love.load()
 
     --Inicializando Interface gráfica
     UI = love.graphics.newImage("UI/UIIconsActions.png");
-    fonteName = love.graphics.newFont("Fonte/fonte.ttf", 32)
+    fonteName = love.graphics.newFont("Fonte/Roboto-Medium.ttf", 32)
     name = {{0,0,0}, "PIKACHU"} -- MUDAR
     animation = animationNormal --MUDAR
 
@@ -30,6 +30,9 @@ function love.load()
     -- variaveis de controle
     hasPoop = false --MUDAR
     isSleep = false 
+    healthPercent = "100" --MUDAR
+    happyPercent = "100" --MUDAR
+    hungryPercent = "100" --MUDAR
 end
 
 function love.update(dt)
@@ -42,7 +45,10 @@ end
 function love.draw()
     love.graphics.draw(UI, 0, 0, 0, 1)
     love.graphics.setFont(fonteName)
-    love.graphics.printf(name, 174, 120, 150, "center")
+    love.graphics.printf(name, love.graphics.getWidth() / 2  - 66, 135, 135, "center")
+    love.graphics.printf({{0,0,0},"Health: \n" .. healthPercent .. "%"}, 0, 0, 200, "center")
+    love.graphics.printf({{0,0,0},"Happiness: \n" .. happyPercent .. "%"}, 210, 0, 250, "center")
+    love.graphics.printf({{0,0,0},"Hungry: \n" .. hungryPercent .. "%"}, 440, 0, 250, "center")
     local spriteNum = math.floor(animation.currentTime / animation.duration * #animation.quads) + 1
     love.graphics.draw(animation.spriteSheet, animation.quads[spriteNum], middleX(344), middleY(344), 0, 1)
     if hasPoop then
@@ -96,10 +102,12 @@ function love.mousepressed(mx, my, button)
         mouseStatus = "normal"
         love.mouse.setCursor(normalCursor)
         UI = love.graphics.newImage("UI/UIHealthCareSelected.png");
+
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 435 and mx < 435 + 100 and isSleep == false then
         mouseStatus = "normal"
         love.mouse.setCursor(normalCursor)
         UI = love.graphics.newImage("UI/UIGameSelected.png");
+        
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 572 and mx < 572 + 100 then
         love.mouse.setCursor(normalCursor)
         if mouseStatus ~= "sleep" then
