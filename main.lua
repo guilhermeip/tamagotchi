@@ -27,8 +27,8 @@ function love.load()
     poop = love.graphics.newImage("Imagens/poop.png")
 
     -- variaveis de controle
-    hasPoop = false
-    isSleep = false
+    hasPoop = false --MUDAR
+    isSleep = false 
 end
 
 function love.update(dt)
