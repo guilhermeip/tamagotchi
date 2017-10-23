@@ -4,12 +4,11 @@ function love.load()
     animationNormal = newAnimation(love.graphics.newImage("Sprites/pikachu_normal.png"), 344, 344, 1.5)
     animationBad = newAnimation(love.graphics.newImage("Sprites/pikachu_triste.png"), 344, 344, 2)
     animationSick = newAnimation(love.graphics.newImage("Sprites/pikachu_doente.png"), 344, 344, 2)
+    animationEgg = newAnimation(love.graphics.newImage("Sprites/Egg.png"), 344, 344, 1.5)
 
     --Ajustando a janela (tamanho, titulo e fixa)
     love.window.setMode(688, 688, {resizable=false, vsync=false}) 
     love.graphics.setBackgroundColor(255,255,255)
-    local windowWidth = love.graphics.getWidth()
-    local windowHeight = love.graphics.getHeight()
     love.window.setTitle( "Tamagotchi" )
 
     --Inicializando Interface gráfica
@@ -24,6 +23,11 @@ function love.load()
     love.mouse.setCursor(normalCursor)
     mouseStatus = "normal"
 
+    -- carregar imagens
+    poop = love.graphics.newImage("Imagens/poop.png")
+
+    -- variaveis de controle
+    hasPoop = false
     isSleep = false
 end
 
@@ -40,6 +44,9 @@ function love.draw()
     love.graphics.printf(name, 174, 120, 150, "center")
     local spriteNum = math.floor(animation.currentTime / animation.duration * #animation.quads) + 1
     love.graphics.draw(animation.spriteSheet, animation.quads[spriteNum], middleX(344), middleY(344), 0, 1)
+    if hasPoop then
+        love.graphics.draw(poop, 188, 448, 0, 1)
+    end
 end
 
 function newAnimation(image, width, height, duration)
