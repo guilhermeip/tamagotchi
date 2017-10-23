@@ -30,15 +30,20 @@ function love.load()
     -- variaveis de controle
     hasPoop = false --MUDAR
     isSleep = false 
-    healthPercent = "100" --MUDAR
-    happyPercent = "100" --MUDAR
-    hungryPercent = "100" --MUDAR
+    healthPercent = 100 --MUDAR
+    happyPercent = 100 --MUDAR
+    hungryPercent = 100 --MUDAR
+    healthIsPress = false
 end
 
 function love.update(dt)
     animation.currentTime = animation.currentTime + dt
     if animation.currentTime >= animation.duration then
         animation.currentTime = animation.currentTime - animation.duration
+        if healthIsPress then
+            animation = animationNormal
+            healthIsPress = false
+        end
     end
 end
 
@@ -82,6 +87,7 @@ function middleY(imageY)
 end
 
 function love.mousepressed(mx, my, button)
+    --COMIDA
     if button == 1 and my >= 552 and my < 552 + 100 and  mx >= 21 and mx < 21 + 100 and isSleep == false then
         if mouseStatus ~= "eat" then
             UI = love.graphics.newImage("UI/UIHungrySelected.png");
@@ -92,22 +98,26 @@ function love.mousepressed(mx, my, button)
             mouseStatus = "normal"
             love.mouse.setCursor(normalCursor)
         end
-        
+
+     --BANHEIRO  
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 159 and mx < 159 + 100 and isSleep == false then
         love.mouse.setCursor(normalCursor)
         mouseStatus = "normal"
         UI = love.graphics.newImage("UI/UIToiletSelected.png");
         
+    --CURAR
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 297 and mx < 297 + 100 and isSleep == false then
         mouseStatus = "normal"
         love.mouse.setCursor(normalCursor)
         UI = love.graphics.newImage("UI/UIHealthCareSelected.png");
 
+    --GAME
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 435 and mx < 435 + 100 and isSleep == false then
         mouseStatus = "normal"
         love.mouse.setCursor(normalCursor)
         UI = love.graphics.newImage("UI/UIGameSelected.png");
 
+    --DORMIR
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 572 and mx < 572 + 100 then
         love.mouse.setCursor(normalCursor)
         if mouseStatus ~= "sleep" then
@@ -127,10 +137,15 @@ end
 function love.mousereleased( mx, my, button )
 --     if button == 1 and my >= 537 and my < 537 + 100 and  mx >= 37 and mx < 37 + 100 then
 --         UI = love.graphics.newImage("UI/UIIconsActions.png");
+    --BANHEIRO
     if button == 1 and my >= 552 and my < 552 + 100 and  mx >= 159 and mx < 159 + 100 and isSleep == false then
          UI = love.graphics.newImage("UI/UIIconsActions.png");
+    
+    --CURAR
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 297 and mx < 297 + 100 and isSleep == false then
-         UI = love.graphics.newImage("UI/UIIconsActions.png");
+         UI = love.graphics.newImage("UI/UIIconsActions.png")
+         animation = animationVaccione
+         healthIsPress = true
 --     elseif button == 1 and my >= 537 and my < 537 + 100 and  mx >= 450 and mx < 450 + 100 then
 --         UI = love.graphics.newImage("UI/UIIconsActions.png");
 --     elseif button == 1 and my >= 537 and my < 537 + 100 and  mx >= 587 and mx < 587 + 100 then
