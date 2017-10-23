@@ -5,6 +5,7 @@ function love.load()
     animationBad = newAnimation(love.graphics.newImage("Sprites/pikachu_triste.png"), 344, 344, 2)
     animationSick = newAnimation(love.graphics.newImage("Sprites/pikachu_doente.png"), 344, 344, 2)
     animationEgg = newAnimation(love.graphics.newImage("Sprites/Egg.png"), 344, 344, 1.5)
+    animationVaccione = newAnimation(love.graphics.newImage("Sprites/Vaccine.png"), 344, 344, 2)
 
     --Ajustando a janela (tamanho, titulo e fixa)
     love.window.setMode(688, 688, {resizable=false, vsync=false}) 
