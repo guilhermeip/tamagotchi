@@ -48,7 +48,7 @@ function love.draw()
     love.graphics.printf(name, love.graphics.getWidth() / 2  - 66, 135, 135, "center")
     love.graphics.printf({{0,0,0},"Health: \n" .. healthPercent .. "%"}, 0, 0, 200, "center")
     love.graphics.printf({{0,0,0},"Happiness: \n" .. happyPercent .. "%"}, 210, 0, 250, "center")
-    love.graphics.printf({{0,0,0},"Hungry: \n" .. hungryPercent .. "%"}, 440, 0, 250, "center")
+    love.graphics.printf({{0,0,0},"Hunger: \n" .. hungryPercent .. "%"}, 440, 0, 250, "center")
     local spriteNum = math.floor(animation.currentTime / animation.duration * #animation.quads) + 1
     love.graphics.draw(animation.spriteSheet, animation.quads[spriteNum], middleX(344), middleY(344), 0, 1)
     if hasPoop then
@@ -107,7 +107,7 @@ function love.mousepressed(mx, my, button)
         mouseStatus = "normal"
         love.mouse.setCursor(normalCursor)
         UI = love.graphics.newImage("UI/UIGameSelected.png");
-        
+
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 572 and mx < 572 + 100 then
         love.mouse.setCursor(normalCursor)
         if mouseStatus ~= "sleep" then
@@ -121,20 +121,6 @@ function love.mousepressed(mx, my, button)
             animation = animationNormal -- MUDAR
             mouseStatus = "normal"
         end
-    end
-end
-
-function setAnimation(status)
-    if(status == "normal")then
-        return animationNormal
-    elseif status == "eat" then
-        return 
-    elseif status == "heal" then
-        return
-    elseif status == "toilet" then
-        return
-    elseif status == "sleep" then
-        return animationSleep
     end
 end
 
