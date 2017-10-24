@@ -8,6 +8,7 @@ function love.load()
     animationEgg = newAnimation(love.graphics.newImage("Sprites/Egg.png"), 344, 344, 1.5)
     animationVaccione = newAnimation(love.graphics.newImage("Sprites/Vaccine.png"), 344, 344, 2)
     animation = animationNormal --MUDAR
+    animationLast = animation
 
     --Imagens do Mini-Game
     game_base = love.graphics.newImage("MiniGame/game_base.png")
@@ -32,7 +33,7 @@ function love.load()
     fonteName = love.graphics.newFont("Fonte/Roboto-Medium.ttf", 32)
 
 
-    name = {{0,0,0}, "PIKACHU"} -- MUDAR
+    name = {{0,0,0}, "PIKACHU"} 
     math.randomseed(os.time())
     
     --Carregando imagens do mouse
@@ -53,6 +54,7 @@ function love.load()
     --controle gerais
     isSleep = false
     healthIsPress = false
+    isSick = false
 
     --controle game
     imageGame = game_base
@@ -62,9 +64,10 @@ function love.load()
     resultGame = {{0,0,0,}, "----"}
 
     --Status VPET
+    state = "normal" -- MUDAR
     numberRateHealth = 2/100 
     healthRate = numberRateHealth -- MUDAR
-    healthPercent = 65 --MUDAR
+    healthPercent = 60 --MUDAR
     healthPercentFloat = healthPercent
 
     numberRateHappy = 5/100
@@ -79,9 +82,10 @@ function love.load()
 
     numberRateEnergy = 5/100
     energyRate = numberRateEnergy
-    energyPercent = 65
+    energyPercent = 98
     energyPercentFloat = energyPercent
 
+    selected = ""
 end
 
 function love.update(dt)
@@ -90,7 +94,7 @@ function love.update(dt)
         animation.currentTime = animation.currentTime - animation.duration
         if healthIsPress then
             hasPoop = hasPoopAux
-            animation = animationNormal -- MUDAR
+            animation = animationLast
             healthIsPress = false
         end
     end
@@ -110,38 +114,110 @@ function love.update(dt)
         energyPercent = math.floor(energyPercentFloat)
     else
         --energy incremento (dormindo)
-        energyPercentFloat = energyPercentFloat + (energyRate * randomFloat(1.1,1.4)) * dt
-        energyPercent = math.floor(energyPercentFloat)
-        if energyPercent == 100 then
+        if energyPercent <= 98 then
+            energyPercentFloat = energyPercentFloat + (energyRate * randomFloat(1.1,1.4)) * dt
+            energyPercent = math.floor(energyPercentFloat)
+        else
+            energyPercentFloat = 100
             isSleep = false
+            UI = UINormal
+            mouseStatus = "normal"
+            animation = animationLast
         end
     end
 
     if hasPoop then
         healthRate = numberRateHealth * 2
+    else
+        healthRate = numberRateHealth
     end
 
-    if healthPercent <= 0 then
-    
-    elseif energyPercent <= 0 then
-        animation = animationSleep
-
-    elseif healthPercent < 60 then
-        healthRate = numberRateHappy * 2 
-        animation = animationSick
-        isSick = true
-        
-    elseif energyPercent <= 60 and energyPercent > 0 then
-        animation = animationTired
-    elseif happyPercent < 60 then
-        animation = animationBad
-    else
-        if not isSleep then
+    if state == "normal"  then
+        if selected ~= "normal" then 
             animation = animationNormal
-        else
-            animation = animationSleep
+            animationLast = animation
+            selected = "normal"
         end
-    end    
+        energyRate = numberRateEnergy
+        happyRate = numberRateHappy
+        healthRate = numberRateHealth
+        hungryRate = numberRateHungry
+        
+        if healthPercent < 60 then
+            state = "sick" 
+        end
+        if happyPercent < 50 then
+            state = "sad"
+        end 
+        if energyPercent < 30 then
+            state = "tired"
+        end
+        if energyPercent <= 0 or happyPercent <= 0 or healthPercent <= 0 or hungryPercent <= 0 then
+            state = "dead"
+        end
+        
+    elseif state == "sick" then
+        if selected ~= "sick" then
+            animation = animationSick
+            animationLast = animation
+            selected = "sick"
+            isSick = true
+        end
+        energyRate = numberRateEnergy * 2
+        happyRate = numberRateHappy * 2
+        healthRate = numberRateHealth * 3
+        hungryRate = numberRateHungry
+
+        if not isSick then
+            state = "normal"
+        end
+        if energyPercent <= 0 or happyPercent <= 0 or healthPercent <= 0 or hungryPercent <= 0 then
+            state = "dead"
+        end
+
+    elseif state == "sad" then
+        if selected ~= "sad" then
+            animation = animationBad
+            animationLast = animation
+            selected = "sad"
+        end
+        energyRate = numberRateEnergy
+        happyRate = numberRateHappy * 3
+        healthRate = numberRateHealth * 2
+        hungryRate = numberRateHungry
+
+        if happyPercent >= 50 then
+            state = "normal"
+        end
+        if energyPercent <= 0 or happyPercent <= 0 or healthPercent <= 0 or hungryPercent <= 0 then
+            state = "dead"
+        end
+    
+    elseif state == "tired" then
+        if selected ~= "tired" then
+            animation = animationTired
+            animationLast = animation
+            selected = "tired"
+        end
+        energyRate = numberRateEnergy * 3
+        happyRate = numberRateHappy * 2
+        healthRate = numberRateHealth 
+        hungryRate = numberRateHungry * 3
+
+        
+        if energyPercent >= 99 then
+            state = "normal"
+        end
+        
+        
+        if energyPercent <= 0 or happyPercent <= 0 or healthPercent <= 0 or hungryPercent <= 0 then
+            state = "dead"
+        end
+
+    elseif state == "dead" then
+        print ("morreu")
+    end
+
 end
 
 function love.draw()
@@ -165,34 +241,6 @@ function love.draw()
         love.graphics.draw(imageGame, middleX(344), middleY(344), 0, 1)
         love.graphics.printf(resultGame, love.graphics.getWidth() / 2  + 10, 210, 100, "center")
     end
-
-    
-
-end
-
-function newAnimation(image, width, height, duration)
-    local animation = {}
-    animation.spriteSheet = image;
-    animation.quads = {};
-    
-    for y = 0, image:getHeight() - height, height do
-        for x = 0, image:getWidth() - width, width do
-            table.insert(animation.quads, love.graphics.newQuad(x, y, width, height, image:getDimensions()))
-        end
-    end
-    
-    animation.duration = duration or 1
-    animation.currentTime = 0
-    
-    return animation
-end
-
-function middleX(imageX)
-    return (love.graphics.getWidth() / 2) - (imageX / 2)
-end
-
-function middleY(imageY)
-    return (love.graphics.getHeight() / 2) - (imageY / 2)
 end
 
 function love.mousepressed(mx, my, button)
@@ -222,11 +270,15 @@ function love.mousepressed(mx, my, button)
         
     --CURAR
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 297 and mx < 297 + 100 and isSleep == false then
-        mouseStatus = "normal"
+        mouseStatus = "heal"
         love.mouse.setCursor(normalCursor)
         UI = UIHealth;
-        isSick = false
-        healthPercentFloat = 100
+        if isSick then
+            isSick = false
+            healthPercentFloat = 100
+        else
+            healthPercentFloat = healthPercentFloat - 10
+        end
 
     --GAME
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 435 and mx < 435 + 100 and isSleep == false then
@@ -245,15 +297,18 @@ function love.mousepressed(mx, my, button)
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 572 and mx < 572 + 100 then
         love.mouse.setCursor(normalCursor)
         if mouseStatus ~= "sleep" then
+            animationLast = animation
             UI = UISleep;
             isSleep = true
             animation = animationSleep
             mouseStatus = "sleep"
         else
-            isSleep = false
-            UI = UINormal;
-            animation = animationNormal -- MUDAR
-            mouseStatus = "normal"
+            if energyPercent >= 10 then
+                isSleep = false
+                UI = UINormal;
+                animation = animationLast
+                mouseStatus = "normal"
+            end
         end
     end
     --COMER
@@ -271,7 +326,7 @@ function love.mousepressed(mx, my, button)
     --LIMPAR
     if button == 1 and my >= 450 and my < 506 and mx >= 188 and mx < 232 and mouseStatus == "toilet" then
         if hasPoop then
-            if healthPercent < 100 then
+            if healthPercent <= 90 then
                 healthPercent = healthPercent + 10
             end
             hasPoop = false
@@ -318,39 +373,55 @@ function love.mousepressed(mx, my, button)
             end
         end
         -- controle da felicidade de acordo com o resultado
+        energyPercentFloat = energyPercentFloat - 1
         if resultGame == winGame and happyPercent <= 90 then
             happyPercentFloat = happyPercentFloat + 10
-            energyPercentFloat = energyPercentFloat - 1
         elseif resultGame == loseGame and happyPercent <= 98 then
             happyPercentFloat = happyPercentFloat + 2
-            energyPercentFloat = energyPercentFloat - 1
         elseif resultGame == aTieGame and happyPercent <= 95 then
             happyPercentFloat = happyPercentFloat + 5
-            energyPercentFloat = energyPercentFloat - 1
+        elseif happyPercent == 99 then
+            happyPercentFloat = 100
         end
     end
 end
 
 function love.mousereleased( mx, my, button )
---     if button == 1 and my >= 537 and my < 537 + 100 and  mx >= 37 and mx < 37 + 100 then
---         UI = love.graphics.newImage("UI/UIIconsActions.png");
-    -- if button == 1 and my >= 552 and my < 552 + 100 and  mx >= 159 and mx < 159 + 100 and isSleep == false then
-    --      UI = love.graphics.newImage("UI/UIIconsActions.png");
-    
-    --CURAR
     if button == 1 and my >= 552 and my < 552 + 100 and  mx >= 297 and mx < 297 + 100 and isSleep == false then
          UI = UINormal;
+         animationLast = animation
          animation = animationVaccione
          healthIsPress = true
          hasPoopAux = hasPoop
          hasPoop = false
---     elseif button == 1 and my >= 537 and my < 537 + 100 and  mx >= 450 and mx < 450 + 100 then
---         UI = love.graphics.newImage("UI/UIIconsActions.png");
---     elseif button == 1 and my >= 537 and my < 537 + 100 and  mx >= 587 and mx < 587 + 100 then
---         UI = love.graphics.newImage("UI/UIIconsActions.png");
      end
  end
 
  function randomFloat(lower, greater)
     return lower + math.random()  * (greater - lower);
+end
+
+function newAnimation(image, width, height, duration)
+    local animation = {}
+    animation.spriteSheet = image;
+    animation.quads = {};
+    
+    for y = 0, image:getHeight() - height, height do
+        for x = 0, image:getWidth() - width, width do
+            table.insert(animation.quads, love.graphics.newQuad(x, y, width, height, image:getDimensions()))
+        end
+    end
+    
+    animation.duration = duration or 1
+    animation.currentTime = 0
+    
+    return animation
+end
+
+function middleX(imageX)
+    return (love.graphics.getWidth() / 2) - (imageX / 2)
+end
+
+function middleY(imageY)
+    return (love.graphics.getHeight() / 2) - (imageY / 2)
 end
