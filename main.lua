@@ -8,6 +8,12 @@ function love.load()
     animationEgg = newAnimation(love.graphics.newImage("Sprites/Egg.png"), 344, 344, 1.5)
     animationVaccione = newAnimation(love.graphics.newImage("Sprites/Vaccine.png"), 344, 344, 2)
 
+    --Imagens do Mini-Game
+    game_base = love.graphics.newImage("MiniGame/game_base.png")
+    game_paper = love.graphics.newImage("MiniGame/game_paper.png")
+    game_rock = love.graphics.newImage("MiniGame/game_rock.png")
+    game_scissors = love.graphics.newImage("MiniGame/game_scissors.png")
+
     --Ajustando a janela (tamanho, titulo e fixa)
     love.window.setMode(688, 688, {resizable=false, vsync=false}) 
     love.graphics.setBackgroundColor(255,255,255)
@@ -21,11 +27,11 @@ function love.load()
     math.randomseed(os.time())
     
     --Carregando imagens do mouse
-        normalCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/normalCursor.png"), 1, 1)
-        appleCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/appleCursor.png"), 27, 31)
-        spongeCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/spongeCursor.png"), 27, 31)
-        love.mouse.setCursor(normalCursor)
-        mouseStatus = "normal"
+    normalCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/normalCursor.png"), 1, 1)
+    appleCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/appleCursor.png"), 27, 31)
+    spongeCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/spongeCursor.png"), 27, 31)
+    love.mouse.setCursor(normalCursor)
+    mouseStatus = "normal"
         
     -- carregar imagens
     poop = love.graphics.newImage("Imagens/poop.png")
@@ -39,6 +45,11 @@ function love.load()
     --controle gerais
     isSleep = false
     healthIsPress = false
+
+    --controle game
+    imageGame = game_base
+    pontos = 0
+    showPontos = {{0,0,0}, pontos}
 
     --Status VPET 
     hungryRate = 5/100
@@ -69,11 +80,19 @@ function love.draw()
     love.graphics.printf({{0,0,0},"Health: \n" .. healthPercent .. "%"}, 0, 0, 200, "center")
     love.graphics.printf({{0,0,0},"Happiness: \n" .. happyPercent .. "%"}, 210, 0, 250, "center")
     love.graphics.printf({{0,0,0},"Hunger: \n" .. hungryPercent .. "%"}, 440, 0, 250, "center")
-    local spriteNum = math.floor(animation.currentTime / animation.duration * #animation.quads) + 1
-    love.graphics.draw(animation.spriteSheet, animation.quads[spriteNum], middleX(344), middleY(344), 0, 1)
+    if mouseStatus ~= "game" then
+        local spriteNum = math.floor(animation.currentTime / animation.duration * #animation.quads) + 1
+        love.graphics.draw(animation.spriteSheet, animation.quads[spriteNum], middleX(344), middleY(344), 0, 1)
+    end    
+
     if hasPoop then
         love.graphics.draw(poop, 188, 448, 0, 1)
     end
+    
+    if mouseStatus == "game" then
+        love.graphics.draw(imageGame, middleX(344), middleY(344), 0, 1)
+    end
+
 end
 
 function newAnimation(image, width, height, duration)
@@ -134,7 +153,7 @@ function love.mousepressed(mx, my, button)
 
     --GAME
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 435 and mx < 435 + 100 and isSleep == false then
-        mouseStatus = "normal"
+        mouseStatus = "game"
         love.mouse.setCursor(normalCursor)
         UI = love.graphics.newImage("UI/UIGameSelected.png");
 
@@ -168,6 +187,14 @@ function love.mousepressed(mx, my, button)
             hasPoop = false
         end
     end
+    -- JOGAR
+    if button == 1 and my >= 173 and my < 516 and  mx >= 173 and mx < 333 and isSleep == false then
+        -- entrar no primeiro botão do jogo (pedra)
+        if my < 276 then
+            if randomImageMiniGame == 1 then
+            end
+        end
+    end
 end
 
 function love.mousereleased( mx, my, button )
@@ -192,4 +219,16 @@ function love.mousereleased( mx, my, button )
 
  function randomFloat(lower, greater)
     return lower + math.random()  * (greater - lower);
+end
+
+function randomImageMiniGame()
+    local numeroRandom = math.random(1,3)
+    if numeroRandom == 1 then
+        imageGame = game_rock
+    elseif numeroRandom == 2 then
+        imageGame = game_paper
+    else
+        imageGame = game_scissors
+    end
+    return numeroRandom
 end
