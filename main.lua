@@ -48,13 +48,15 @@ function love.load()
 
     --controle game
     imageGame = game_base
-    pontos = 0
-    showPontos = {{0,0,0}, pontos}
+    winGame = {{0,0,0}, "WIN"}
+    loseGame = {{0,0,0}, "LOSE"}
+    aTieGame = {{0,0,0}, "A TIE"}
+    resultGame = {{0,0,0,}, "----"}
 
     --Status VPET 
     hungryRate = 5/100
     healthPercent = 100 --MUDAR
-    happyPercent = 100 --MUDAR
+    happyPercent = 80 --MUDAR
     hungryPercent = 100 --MUDAR
     hungryPercentFloat = hungryPercent
 end
@@ -91,6 +93,7 @@ function love.draw()
     
     if mouseStatus == "game" then
         love.graphics.draw(imageGame, middleX(344), middleY(344), 0, 1)
+        love.graphics.printf(resultGame, love.graphics.getWidth() / 2  + 10, 210, 100, "center")
     end
 
 end
@@ -153,9 +156,17 @@ function love.mousepressed(mx, my, button)
 
     --GAME
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 435 and mx < 435 + 100 and isSleep == false then
-        mouseStatus = "game"
-        love.mouse.setCursor(normalCursor)
-        UI = love.graphics.newImage("UI/UIGameSelected.png");
+        if mouseStatus ~= "game" then
+            UI = love.graphics.newImage("UI/UIGameSelected.png");    
+            love.mouse.setCursor(normalCursor)
+            mouseStatus = "game"
+        else
+            UI = love.graphics.newImage("UI/UIIconsActions.png");
+            mouseStatus = "normal"
+            love.mouse.setCursor(normalCursor)
+            imageGame = game_base
+            resultGame = {{0,0,0,}, "----"}
+        end
 
     --DORMIR
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 572 and mx < 572 + 100 then
@@ -188,11 +199,52 @@ function love.mousepressed(mx, my, button)
         end
     end
     -- JOGAR
-    if button == 1 and my >= 173 and my < 516 and  mx >= 173 and mx < 333 and isSleep == false then
+    if button == 1 and my >= 173 and my < 516 and  mx >= 173 and mx < 333 and mouseStatus == "game" then
+        local randomNumber = math.random(1,3)
         -- entrar no primeiro botão do jogo (pedra)
-        if my < 276 then
-            if randomImageMiniGame == 1 then
+        if my < 276 and mx >= 173 and mx < 333 then
+            if randomNumber == 1 then
+                resultGame = aTieGame
+                imageGame = game_rock
+            elseif randomNumber == 2 then
+                resultGame = loseGame
+                imageGame = game_paper
+            else
+                resultGame = winGame
+                imageGame = game_scissors 
             end
+        -- (papel)
+        elseif my >= 277 and my < 383 and mx >= 173 and mx < 333 then
+            if randomNumber == 2 then
+                resultGame = aTieGame
+                imageGame = game_paper
+            elseif randomNumber == 3 then
+                resultGame = loseGame
+                imageGame = game_scissors
+            else
+                resultGame = winGame
+                imageGame = game_rock
+            end
+        --(tesoura)
+        elseif my >= 384 and my <= 516 and mx >= 173 and mx < 333 then
+            if randomNumber == 3 then
+                resultGame = aTieGame
+                imageGame = game_scissors
+            elseif randomNumber == 1 then
+                resultGame = loseGame
+                imageGame = game_rock
+            else
+                resultGame = winGame
+                imageGame = game_paper
+            end
+        end
+        -- controle da felicidade de acordo com o resultado
+        if resultGame == winGame and happyPercent <= 90 then
+            happyPercent = happyPercent + 10
+        elseif resultGame == loseGame and happyPercent <= 98 then
+            happyPercent = happyPercent + 2
+        elseif resultGame == aTieGame and happyPercent <= 95 then
+            happyPercent = happyPercent + 5
         end
     end
 end
@@ -219,16 +271,4 @@ function love.mousereleased( mx, my, button )
 
  function randomFloat(lower, greater)
     return lower + math.random()  * (greater - lower);
-end
-
-function randomImageMiniGame()
-    local numeroRandom = math.random(1,3)
-    if numeroRandom == 1 then
-        imageGame = game_rock
-    elseif numeroRandom == 2 then
-        imageGame = game_paper
-    else
-        imageGame = game_scissors
-    end
-    return numeroRandom
 end
