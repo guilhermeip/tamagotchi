@@ -11,31 +11,40 @@ function love.load()
     love.window.setMode(688, 688, {resizable=false, vsync=false}) 
     love.graphics.setBackgroundColor(255,255,255)
     love.window.setTitle( "Tamagotchi" )
-
+    
     --Inicializando Interface gráfica
     UI = love.graphics.newImage("UI/UIIconsActions.png");
     fonteName = love.graphics.newFont("Fonte/Roboto-Medium.ttf", 32)
     name = {{0,0,0}, "PIKACHU"} -- MUDAR
     animation = animationNormal --MUDAR
-
+    math.randomseed(os.time())
+    
     --Carregando imagens do mouse
-    normalCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/normalCursor.png"), 1, 1)
-    appleCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/appleCursor.png"), 27, 31)
-    spongeCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/spongeCursor.png"), 27, 31)
-    love.mouse.setCursor(normalCursor)
-    mouseStatus = "normal"
-
+        normalCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/normalCursor.png"), 1, 1)
+        appleCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/appleCursor.png"), 27, 31)
+        spongeCursor =  love.mouse.newCursor(love.image.newImageData("Imagens/spongeCursor.png"), 27, 31)
+        love.mouse.setCursor(normalCursor)
+        mouseStatus = "normal"
+        
     -- carregar imagens
     poop = love.graphics.newImage("Imagens/poop.png")
 
+
     -- variaveis de controle
+    --poop
     hasPoop = true --MUDAR
     hasPoopAux = hasPoop
-    isSleep = false 
+
+    --controle gerais
+    isSleep = false
+    healthIsPress = false
+
+    --Status VPET 
+    hungryRate = 5/100
     healthPercent = 100 --MUDAR
     happyPercent = 100 --MUDAR
     hungryPercent = 100 --MUDAR
-    healthIsPress = false
+    hungryPercentFloat = hungryPercent
 end
 
 function love.update(dt)
@@ -48,6 +57,8 @@ function love.update(dt)
             healthIsPress = false
         end
     end
+    hungryPercentFloat = hungryPercentFloat - (hungryRate * randomFloat(0.8,1.1)) * dt
+    hungryPercent = string.format("%.0f", hungryPercentFloat)
 end
 
 function love.draw()
@@ -177,3 +188,7 @@ function love.mousereleased( mx, my, button )
 --         UI = love.graphics.newImage("UI/UIIconsActions.png");
      end
  end
+
+ function randomFloat(lower, greater)
+    return lower + math.random()  * (greater - lower);
+end
