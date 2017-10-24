@@ -54,11 +54,22 @@ function love.load()
     resultGame = {{0,0,0,}, "----"}
 
     --Status VPET 
-    hungryRate = 5/100
+    healthRate = 5/100 -- MUDAR
     healthPercent = 100 --MUDAR
-    happyPercent = 80 --MUDAR
+    healthPercentFloat = healthPercent
+
+    happyRate = 5/100 -- MUDAR
+    happyPercent = 100 -- MUDAR
+    happyPercentFloat = happyPercent
+    
+    hungryRate = 5/100 -- MUDAR
     hungryPercent = 100 --MUDAR
     hungryPercentFloat = hungryPercent
+
+    energyRate = 5/100
+    energyPercent = 100
+    energyPercentFloat = energyPercent
+
 end
 
 function love.update(dt)
@@ -71,8 +82,40 @@ function love.update(dt)
             healthIsPress = false
         end
     end
+    --hungry decremento
     hungryPercentFloat = hungryPercentFloat - (hungryRate * randomFloat(0.8,1.1)) * dt
-    hungryPercent = string.format("%.0f", hungryPercentFloat)
+    hungryPercent = math.floor( hungryPercentFloat)
+    --health decremento
+    healthPercentFloat = healthPercentFloat - (healthRate * randomFloat(0.8,1.1)) * dt
+    healthPercent = math.floor(healthPercentFloat)
+    --health decremento
+    happyPercentFloat = happyPercentFloat - (happyRate * randomFloat(0.8,1.1)) * dt
+    happyPercent = math.floor(happyPercentFloat)
+    --energy decremento
+    energyPercentFloat = energyPercentFloat - (energyRate * randomFloat(0.8,1.1)) * dt
+    energyPercent = math.floor(energyPercentFloat)
+
+    if healthPercent <= 0 then
+    
+    elseif energyPercent <= 0 then
+        animation = animationSleep
+
+    elseif healthPercent < 60 then
+        healthRate = healthRate * 2 
+        animation = animationSick
+        isSick = true
+        
+    elseif energyPercent <= 60 and energyPercent > 0 then
+    
+    elseif happyPercent < 60 then
+    
+    else
+        animation = animationNormal
+    end
+
+    end
+   
+    
 end
 
 function love.draw()
@@ -95,6 +138,8 @@ function love.draw()
         love.graphics.draw(imageGame, middleX(344), middleY(344), 0, 1)
         love.graphics.printf(resultGame, love.graphics.getWidth() / 2  + 10, 210, 100, "center")
     end
+
+    
 
 end
 
@@ -153,17 +198,18 @@ function love.mousepressed(mx, my, button)
         mouseStatus = "normal"
         love.mouse.setCursor(normalCursor)
         UI = love.graphics.newImage("UI/UIHealthCareSelected.png");
+        isSick = false
+        healthPercentFloat = 100
 
     --GAME
     elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 435 and mx < 435 + 100 and isSleep == false then
+        love.mouse.setCursor(normalCursor)
         if mouseStatus ~= "game" then
             UI = love.graphics.newImage("UI/UIGameSelected.png");    
-            love.mouse.setCursor(normalCursor)
             mouseStatus = "game"
         else
             UI = love.graphics.newImage("UI/UIIconsActions.png");
             mouseStatus = "normal"
-            love.mouse.setCursor(normalCursor)
             imageGame = game_base
             resultGame = {{0,0,0,}, "----"}
         end
@@ -185,8 +231,13 @@ function love.mousepressed(mx, my, button)
     end
     --COMER
     if button == 1 and my >= 173 and my < 516 and mx >= 173 and mx < 516 and mouseStatus == "eat" then
-        if healthPercent < 100 then
-            hungryPercent = hungryPercent + 10
+        if hungryPercent <= 95 then
+            hungryPercentFloat = hungryPercentFloat + 5
+            if healthPercent <= 98 then
+                healthPercentFloat = healthPercentFloat + 2
+            end
+        else
+            healthPercentFloat = healthPercentFloat - 3
         end
     end
     --LIMPAR
