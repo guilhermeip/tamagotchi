@@ -30,6 +30,7 @@ function love.load()
 
     -- variaveis de controle
     hasPoop = true --MUDAR
+    hasPoopAux = hasPoop
     isSleep = false 
     healthPercent = 100 --MUDAR
     happyPercent = 100 --MUDAR
@@ -42,7 +43,8 @@ function love.update(dt)
     if animation.currentTime >= animation.duration then
         animation.currentTime = animation.currentTime - animation.duration
         if healthIsPress then
-            animation = animationNormal
+            hasPoop = hasPoopAux
+            animation = animationNormal -- MUDAR
             healthIsPress = false
         end
     end
@@ -141,27 +143,34 @@ function love.mousepressed(mx, my, button)
     end
     --COMER
     if button == 1 and my >= 173 and my < 516 and mx >= 173 and mx < 516 and mouseStatus == "eat" then
-        hungryPercent = hungryPercent + 10
+        if healthPercent < 100 then
+            hungryPercent = hungryPercent + 10
+        end
     end
     --LIMPAR
     if button == 1 and my >= 450 and my < 506 and mx >= 188 and mx < 232 and mouseStatus == "toilet" then
-        healthPercent = healthPercent + 10
-        hasPoop = false
+        if hasPoop then
+            if healthPercent < 100 then
+                healthPercent = healthPercent + 10
+            end
+            hasPoop = false
+        end
     end
 end
 
 function love.mousereleased( mx, my, button )
 --     if button == 1 and my >= 537 and my < 537 + 100 and  mx >= 37 and mx < 37 + 100 then
 --         UI = love.graphics.newImage("UI/UIIconsActions.png");
-    --BANHEIRO
-    if button == 1 and my >= 552 and my < 552 + 100 and  mx >= 159 and mx < 159 + 100 and isSleep == false then
-         UI = love.graphics.newImage("UI/UIIconsActions.png");
+    -- if button == 1 and my >= 552 and my < 552 + 100 and  mx >= 159 and mx < 159 + 100 and isSleep == false then
+    --      UI = love.graphics.newImage("UI/UIIconsActions.png");
     
     --CURAR
-    elseif button == 1 and my >= 552 and my < 552 + 100 and  mx >= 297 and mx < 297 + 100 and isSleep == false then
+    if button == 1 and my >= 552 and my < 552 + 100 and  mx >= 297 and mx < 297 + 100 and isSleep == false then
          UI = love.graphics.newImage("UI/UIIconsActions.png")
          animation = animationVaccione
          healthIsPress = true
+         hasPoopAux = hasPoop
+         hasPoop = false
 --     elseif button == 1 and my >= 537 and my < 537 + 100 and  mx >= 450 and mx < 450 + 100 then
 --         UI = love.graphics.newImage("UI/UIIconsActions.png");
 --     elseif button == 1 and my >= 537 and my < 537 + 100 and  mx >= 587 and mx < 587 + 100 then
