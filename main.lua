@@ -14,8 +14,7 @@ function love.load()
     animationTired = newAnimation(love.graphics.newImage("Sprites/pikachu_cansado.png"), 344, 344, 2)
     animationEgg = newAnimation(love.graphics.newImage("Sprites/Egg.png"), 344, 344, 1.5)
     animationVaccione = newAnimation(love.graphics.newImage("Sprites/Vaccine.png"), 344, 344, 2)
-    animation = animationNormal --MUDAR
-    animationLast = animation
+    
 
     --Imagens do Mini-Game
     game_base = love.graphics.newImage("MiniGame/game_base.png")
@@ -26,7 +25,6 @@ function love.load()
     --Ajustando a janela (tamanho, titulo e fixa)
     love.window.setMode(688, 688, {resizable=false, vsync=true}) 
     love.graphics.setBackgroundColor(255,255,255)
-    love.window.setTitle( "Tamagotchi" )
     
     --Inicializando Interface gráfica
     UINormal = love.graphics.newImage("UI/UIIconsActions.png");
@@ -51,7 +49,6 @@ function love.load()
     gameMusic:setVolume(0.5)
     love.audio.play(mainMusic)
 
-
     name = {{0,0,0}, "PIKACHU"} 
     math.randomseed(os.time())
     
@@ -65,16 +62,11 @@ function love.load()
     -- carregar imagens
     poop = love.graphics.newImage("Imagens/poop.png")
 
-    -- variaveis de controle
-    --poop
-    hasPoop = true --MUDAR
-    hasPoopAux = hasPoop
-
     --controle gerais
-    isSleep = false
     healthIsPress = false
-    isSick = false
-
+    timeSave = 10
+    
+    timeToSave = 0
     --controle game
     imageGame = game_base
     winGame = {{0,0,0}, "WIN"}
@@ -83,31 +75,136 @@ function love.load()
     resultGame = {{0,0,0,}, "----"}
 
     --Status VPET
-    state = "normal" -- MUDAR
     numberRateHealth = 2/100 
-    healthRate = numberRateHealth -- MUDAR
-    healthPercent = 60 --MUDAR
-    healthPercentFloat = healthPercent
+    healthRate = numberRateHealth
 
     numberRateHappy = 5/100
-    happyRate = numberRateHappy -- MUDAR
-    happyPercent = 65 -- MUDAR
-    happyPercentFloat = happyPercent
+    happyRate = numberRateHappy 
+    
     
     numberRateHungry = 6/100
-    hungryRate = numberRateHungry -- MUDAR
-    hungryPercent = 65 --MUDAR
-    hungryPercentFloat = hungryPercent
+    hungryRate = numberRateHungry 
+    
 
     numberRateEnergy = 5/100
     energyRate = numberRateEnergy
-    energyPercent = 98
-    energyPercentFloat = energyPercent
-
     selected = ""
+
+    --save
+    
+
+    carregarDados()
+end
+function escreverDados()
+    local data = getAnimation() .. "\n" ..
+                tostring(hasPoop) .. "\n" ..
+                tostring(isSleep) .. "\n" ..
+                tostring(isSick) .. "\n" ..
+                state .. "\n" .. 
+                healthPercent .. "\n" ..
+                happyPercent .. "\n" .. 
+                hungryPercent .. "\n" ..
+                energyPercent
+    
+    love.filesystem.write("data.txt", data)
+end
+function getAnimation()
+    if animation == animationNormal then
+        return "animationNormal"
+    elseif animation == animationSleep then
+        return "animationSleep"
+    elseif animation == animationBad then
+        return "animationBad"
+    elseif animation == animationSick then
+        return "animationSick"
+    elseif animation == animationTired then
+        return "animationTired"
+    end
+end
+function setAnimation(animacao)
+    if animacao == "animationNormal" then
+        return animationNormal
+    elseif animacao == "animationSleep" then
+        return animationSleep
+    elseif animacao == "animationBad" then
+        return animationBad
+    elseif animacao == "animationSick" then
+        return animationSick
+    elseif animacao == "animationTired" then
+        return animationTired
+    end
+end
+
+function carregarDados()
+    -- 1-animation
+    -- 2-coco
+    -- 3-dormindo
+    -- 4-doente
+    -- 5-estado
+    -- 6-vida
+    -- 7-felicidade
+    -- 8-fome
+    -- 9-energia
+
+    if love.filesystem.exists("data.txt") then
+        i = 1
+        for line in love.filesystem.lines("data.txt") do
+            if i == 1 then
+              animation = setAnimation(tostring(line))  
+              animationLast = animation
+            elseif i == 2 then
+                if tostring(line) == "true" then
+                    hasPoop = true
+                else
+                    hasPoop = false
+                end
+                hasPoopAux = hasPoop
+            elseif i == 3 then
+                if tostring(line) == "true" then
+                    isSleep = true
+                else
+                    isSleep = false
+                end
+                
+            elseif i == 4 then
+                if tostring(line) == "true" then
+                    isSick = true
+                else
+                    isSick = false
+                end
+    
+            elseif i == 5 then
+                state = tostring(line)
+
+            elseif i == 6 then
+                healthPercent = tonumber(line)
+                healthPercentFloat = healthPercent
+                
+            elseif i == 7 then
+                happyPercent = tonumber(line)
+                happyPercentFloat = happyPercent
+                
+            elseif i == 8 then
+                hungryPercent = tonumber(line)
+                hungryPercentFloat = hungryPercent
+
+            elseif i == 9 then
+                energyPercent = tonumber(line)
+                energyPercentFloat = energyPercent
+            end
+            i = i+1
+        end
+    else
+        print("Não foi possivel abrir o arquivo")
+    end
 end
 
 function love.update(dt)
+    timeToSave = timeToSave + dt
+    if timeToSave >= timeSave then
+        escreverDados()
+        timeToSave = 0
+    end
     animation.currentTime = animation.currentTime + dt
     if animation.currentTime >= animation.duration then
         animation.currentTime = animation.currentTime - animation.duration
@@ -293,11 +390,11 @@ function love.mousepressed(mx, my, button)
         love.mouse.setCursor(normalCursor)
         UI = UIHealth;
         if isSick then
-            isSick = false
-            healthPercentFloat = 100
             love.audio.pause(mainMusic)
             love.audio.play(healAudio)
             love.audio.play(mainMusic)
+            isSick = false
+            healthPercentFloat = 100
         else
             healthPercentFloat = healthPercentFloat - 10
         end
