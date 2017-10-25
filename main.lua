@@ -64,7 +64,7 @@ function love.load()
 
     --controle gerais
     healthIsPress = false
-    timeSave = 10
+    timeSave = 5
     
     timeToSave = 0
     --controle game
@@ -88,12 +88,16 @@ function love.load()
 
     numberRateEnergy = 5/100
     energyRate = numberRateEnergy
-    selected = ""
-
-    --save
-    
+    selected = ""    
 
     carregarDados()
+    --tempo
+    t1 = tonumber(os.date("%Y%m%d%H%M%S"))
+    deltatime = os.difftime(t2,t1)
+    if deltatime > 0 then
+        petUpdate(deltatime)
+    end
+    print(deltatime)
 end
 function escreverDados()
     local data = getAnimation() .. "\n" ..
@@ -104,7 +108,8 @@ function escreverDados()
                 healthPercent .. "\n" ..
                 happyPercent .. "\n" .. 
                 hungryPercent .. "\n" ..
-                energyPercent
+                energyPercent .. "\n" .. 
+                tonumber(os.date("%Y%m%d%H%M%S"))
     
     love.filesystem.write("data.txt", data)
 end
@@ -145,6 +150,7 @@ function carregarDados()
     -- 7-felicidade
     -- 8-fome
     -- 9-energia
+    -- 10-tempo
 
     if love.filesystem.exists("data.txt") then
         i = 1
@@ -191,6 +197,8 @@ function carregarDados()
             elseif i == 9 then
                 energyPercent = tonumber(line)
                 energyPercentFloat = energyPercent
+            elseif i == 10 then
+                t2 = tonumber(line)
             end
             i = i+1
         end
@@ -199,21 +207,7 @@ function carregarDados()
     end
 end
 
-function love.update(dt)
-    timeToSave = timeToSave + dt
-    if timeToSave >= timeSave then
-        escreverDados()
-        timeToSave = 0
-    end
-    animation.currentTime = animation.currentTime + dt
-    if animation.currentTime >= animation.duration then
-        animation.currentTime = animation.currentTime - animation.duration
-        if healthIsPress then
-            hasPoop = hasPoopAux
-            animation = animationLast
-            healthIsPress = false
-        end
-    end
+function petUpdate(dt)
     --hungry decremento
     hungryPercentFloat = hungryPercentFloat - (hungryRate * randomFloat(0.8,1.1)) * dt
     hungryPercent = math.floor( hungryPercentFloat)
@@ -241,6 +235,24 @@ function love.update(dt)
             animation = animationLast
         end
     end
+end
+
+function love.update(dt)
+    timeToSave = timeToSave + dt
+    if timeToSave >= timeSave then
+        escreverDados()
+        timeToSave = 0
+    end
+    animation.currentTime = animation.currentTime + dt
+    if animation.currentTime >= animation.duration then
+        animation.currentTime = animation.currentTime - animation.duration
+        if healthIsPress then
+            hasPoop = hasPoopAux
+            animation = animationLast
+            healthIsPress = false
+        end
+    end
+    petUpdate(dt)
 
     if hasPoop then
         healthRate = numberRateHealth * 2
