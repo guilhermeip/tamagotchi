@@ -52,6 +52,9 @@ function love.load()
     mainMusic:setVolume(0.5)
     gameMusic:setLooping(true)
     gameMusic:setVolume(0.5)
+    love.audio.stop(gameMusic)
+    love.audio.stop(deadMusic)
+    love.audio.stop(sleepMusic)
     love.audio.play(mainMusic)
 
     name = {{0,0,0}, "PIKACHU"}
@@ -379,6 +382,7 @@ function love.update(dt)
         love.audio.stop(mainMusic)
         love.audio.stop(sleepMusic)
         love.audio.stop(gameMusic)
+        love.audio.play(deadMusic)
     end        
 
 end
