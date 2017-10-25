@@ -92,8 +92,8 @@ function love.load()
 
     carregarDados()
     --tempo
-    t1 = tonumber(os.date("%Y%m%d%H%M%S"))
-    deltatime = os.difftime(t2,t1)
+    
+    deltatime = os.difftime(os.time(),t1)
     if deltatime > 0 then
         petUpdate(deltatime)
     end
@@ -109,7 +109,7 @@ function escreverDados()
                 happyPercent .. "\n" .. 
                 hungryPercent .. "\n" ..
                 energyPercent .. "\n" .. 
-                tonumber(os.date("%Y%m%d%H%M%S"))
+                tonumber(os.time())
     
     love.filesystem.write("data.txt", data)
 end
@@ -198,7 +198,7 @@ function carregarDados()
                 energyPercent = tonumber(line)
                 energyPercentFloat = energyPercent
             elseif i == 10 then
-                t2 = tonumber(line)
+                t1 = tonumber(line)
             end
             i = i+1
         end
