@@ -1,3 +1,8 @@
+local deadMusic = love.audio.newSource("/Audios/Music/dead.mp3", "stream")
+local sleepMusic = love.audio.newSource("/Audios/Music/sleep.mp3", "stream")
+local mainMusic = love.audio.newSource("/Audios/Music/main.mp3", "stream")
+local healAudio = love.audio.newSource("/Audios/Audios/heal.mp3", "static")
+
 function love.load()
     --Carregando animações
     animationSleep = newAnimation(love.graphics.newImage("Sprites/pikachu_dormindo.png"), 344, 344, 2)
@@ -17,7 +22,7 @@ function love.load()
     game_scissors = love.graphics.newImage("MiniGame/game_scissors.png")
 
     --Ajustando a janela (tamanho, titulo e fixa)
-    love.window.setMode(688, 688, {resizable=false, vsync=false}) 
+    love.window.setMode(688, 688, {resizable=false, vsync=true}) 
     love.graphics.setBackgroundColor(255,255,255)
     love.window.setTitle( "Tamagotchi" )
     
@@ -29,8 +34,18 @@ function love.load()
     UIGame = love.graphics.newImage("UI/UIGameSelected.png");
     UIToilet = love.graphics.newImage("UI/UIToiletSelected.png");
     UI = UINormal
+    
     --fonte
     fonteName = love.graphics.newFont("Fonte/Roboto-Medium.ttf", 32)
+
+    --audios
+    deadMusic:setLooping(true)
+    deadMusic:setVolume(0.5)
+    sleepMusic:setLooping(true)
+    sleepMusic:setVolume(0.5)
+    mainMusic:setLooping(true)
+    mainMusic:setVolume(0.5)
+    love.audio.play(mainMusic)
 
 
     name = {{0,0,0}, "PIKACHU"} 
@@ -276,6 +291,9 @@ function love.mousepressed(mx, my, button)
         if isSick then
             isSick = false
             healthPercentFloat = 100
+            love.audio.pause(mainMusic)
+            love.audio.play(healAudio)
+            love.audio.play(mainMusic)
         else
             healthPercentFloat = healthPercentFloat - 10
         end
@@ -301,12 +319,16 @@ function love.mousepressed(mx, my, button)
             UI = UISleep;
             isSleep = true
             animation = animationSleep
+            love.audio.pause(mainMusic)
+            love.audio.play(sleepMusic)
             mouseStatus = "sleep"
         else
             if energyPercent >= 10 then
                 isSleep = false
                 UI = UINormal;
                 animation = animationLast
+                love.audio.stop(sleepMusic)
+                love.audio.play(mainMusic)
                 mouseStatus = "normal"
             end
         end
