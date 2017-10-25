@@ -6,7 +6,6 @@ local healAudio = love.audio.newSource("/Audios/Audios/heal.mp3", "static")
 local winGameAudio = love.audio.newSource("/Audios/Audios/winGame.mp3", "static")
 
 function love.load()
-    print(tostring(love.filesystem.getSaveDirectory()))
     --Carregando animações
     animationSleep = newAnimation(love.graphics.newImage("Sprites/pikachu_dormindo.png"), 344, 344, 2)
     animationNormal = newAnimation(love.graphics.newImage("Sprites/pikachu_normal.png"), 344, 344, 1.5)
@@ -94,7 +93,7 @@ function love.load()
     --save
     
 
-    -- carregarDados()
+    carregarDados()
 end
 function escreverDados()
     local data = getAnimation() .. "\n" ..
@@ -201,11 +200,11 @@ function carregarDados()
 end
 
 function love.update(dt)
-    -- timeToSave = timeToSave + dt
-    -- if timeToSave >= timeSave then
-    --     escreverDados()
-    --     timeToSave = 0
-    -- end
+    timeToSave = timeToSave + dt
+    if timeToSave >= timeSave then
+        escreverDados()
+        timeToSave = 0
+    end
     animation.currentTime = animation.currentTime + dt
     if animation.currentTime >= animation.duration then
         animation.currentTime = animation.currentTime - animation.duration
