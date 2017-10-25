@@ -295,7 +295,7 @@ function love.update(dt)
     end
 
     if state == "normal"  then
-        if selected ~= "normal" then 
+        if selected ~= "normal" and not isSleep then 
             animation = animationNormal
             animationLast = animation
             selected = "normal"
@@ -318,7 +318,7 @@ function love.update(dt)
             state = "dead"
         end
         
-    elseif state == "sick" then
+    elseif state == "sick" and not isSleep then
         if selected ~= "sick" then
             animation = animationSick
             animationLast = animation
@@ -337,7 +337,7 @@ function love.update(dt)
             state = "dead"
         end
 
-    elseif state == "sad" then
+    elseif state == "sad" and not isSleep then
         if selected ~= "sad" then
             animation = animationBad
             animationLast = animation
@@ -355,7 +355,7 @@ function love.update(dt)
             state = "dead"
         end
     
-    elseif state == "tired" then
+    elseif state == "tired" and not isSleep then
         if selected ~= "tired" then
             animation = animationTired
             animationLast = animation
