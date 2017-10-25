@@ -1,7 +1,9 @@
 local deadMusic = love.audio.newSource("/Audios/Music/dead.mp3", "stream")
 local sleepMusic = love.audio.newSource("/Audios/Music/sleep.mp3", "stream")
 local mainMusic = love.audio.newSource("/Audios/Music/main.mp3", "stream")
+local gameMusic = love.audio.newSource("/Audios/Music/game.mp3", "stream")
 local healAudio = love.audio.newSource("/Audios/Audios/heal.mp3", "static")
+local winGameAudio = love.audio.newSource("/Audios/Audios/winGame.mp3", "static")
 
 function love.load()
     --Carregando animações
@@ -45,6 +47,8 @@ function love.load()
     sleepMusic:setVolume(0.5)
     mainMusic:setLooping(true)
     mainMusic:setVolume(0.5)
+    gameMusic:setLooping(true)
+    gameMusic:setVolume(0.5)
     love.audio.play(mainMusic)
 
 
@@ -303,11 +307,15 @@ function love.mousepressed(mx, my, button)
         love.mouse.setCursor(normalCursor)
         if mouseStatus ~= "game" then
             UI = UIGame;
+            love.audio.pause(mainMusic)
+            love.audio.play(gameMusic)
             mouseStatus = "game"
         else
             UI = UINormal;
             mouseStatus = "normal"
             imageGame = game_base
+            love.audio.stop(gameMusic)
+            love.audio.play(mainMusic)
             resultGame = {{0,0,0,}, "----"}
         end
 
@@ -367,6 +375,7 @@ function love.mousepressed(mx, my, button)
                 imageGame = game_paper
             else
                 resultGame = winGame
+                love.audio.play(winGame)
                 imageGame = game_scissors 
             end
         -- (papel)
@@ -379,6 +388,7 @@ function love.mousepressed(mx, my, button)
                 imageGame = game_scissors
             else
                 resultGame = winGame
+                love.audio.play(winGame)
                 imageGame = game_rock
             end
         --(tesoura)
@@ -391,6 +401,7 @@ function love.mousepressed(mx, my, button)
                 imageGame = game_rock
             else
                 resultGame = winGame
+                love.audio.play(winGame)
                 imageGame = game_paper
             end
         end
